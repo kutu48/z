@@ -1,34 +1,28 @@
+# script.py
 import time
-from utils.core.register import register_session
-from utils.blum import authenticate, get_user_info, claim_reward, start_farming
-from utils.core.logger import logger
+from utils.blum import authenticate, get_user_data, claim_rewards, start_farming
 
 def main():
-    session_name = "session_name"
-    register_session(session_name)
+    authenticate()
+    username, balance = get_user_data()
+    if username and balance:
+        print(f"Username: {username}, Balance: {balance}")
+    else:
+        print("Failed to get user data")
 
-    token = authenticate()
-    if not token:
-        logger.error("Exiting due to authentication failure.")
-        return
+    if claim_rewards():
+        print("Claim successful")
+    else:
+        print("Claim failed")
 
-    user_info = get_user_info(token)
-    if user_info:
-        username = user_info.get('username')
-        balance = user_info.get('balance')
-        logger.info(f"Username: {username}, Balance: {balance}")
+    time.sleep(8 * 3600)  # Sleep for 8 hours
 
-    claim_response = claim_reward(token)
-    if claim_response:
-        logger.info("Successfully claimed reward")
-
-    time.sleep(8 * 60 * 60)  # Sleep for 8 hours
-
-    farming_response = start_farming(token)
-    if farming_response:
-        logger.info("Successfully started farming")
+    if start_farming():
+        print("Start farming successful")
+    else:
+        print("Start farming failed")
 
 if __name__ == "__main__":
     while True:
         main()
-        time.sleep(30 * 60)  # Run the script every 30 minutes
+        time.sleep(8 * 3600)
