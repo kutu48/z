@@ -1,6 +1,6 @@
 # api id, hash
-API_ID = 11111111
-API_HASH = 'Your api hash'
+API_ID = 28212858
+API_HASH = '35d9784ce0eb950f0c32cdbd18d55be5'
 
 # задержка между подключениями к аккаунтам
 ACC_DELAY = [1, 15]
