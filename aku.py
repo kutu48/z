@@ -1,35 +1,34 @@
 import time
-from utils.blum import BlumAPI
+from utils.core.register import register_session
+from utils.blum import authenticate, get_user_info, claim_reward, start_farming
+from utils.core.logger import logger
 
 def main():
-    with open('api.txt', 'r') as file:
-        api_id, api_hash = file.read().splitlines()
+    session_name = "session_name"
+    register_session(session_name)
 
-    blum_api = BlumAPI(api_id, api_hash)
+    token = authenticate()
+    if not token:
+        logger.error("Exiting due to authentication failure.")
+        return
 
-    if blum_api.authenticate():
-        print("Authenticated successfully")
+    user_info = get_user_info(token)
+    if user_info:
+        username = user_info.get('username')
+        balance = user_info.get('balance')
+        logger.info(f"Username: {username}, Balance: {balance}")
 
-        username, balance = blum_api.get_user_info()
-        if username and balance:
-            print(f"Username: {username}, Balance: {balance}")
+    claim_response = claim_reward(token)
+    if claim_response:
+        logger.info("Successfully claimed reward")
 
-            if blum_api.claim_rewards():
-                print("Claim successful")
-            else:
-                print("Claim failed")
+    time.sleep(8 * 60 * 60)  # Sleep for 8 hours
 
-            print("Waiting for 8 hours to start farming...")
-            time.sleep(8 * 3600)
+    farming_response = start_farming(token)
+    if farming_response:
+        logger.info("Successfully started farming")
 
-            if blum_api.start_farming():
-                print("Farming started successfully")
-            else:
-                print("Failed to start farming")
-        else:
-            print("Failed to get user information")
-    else:
-        print("Authentication failed")
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    while True:
+        main()
+        time.sleep(30 * 60)  # Run the script every 30 minutes
