@@ -1,44 +1,40 @@
+# blum.py
 import requests
-from utils.core.logger import logger
+from utils.core.loger.py import logger
 
-AUTH_URL = "https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP"
 BASE_URL = "https://game-domain.blum.codes/api/v1/farming"
 USER_CHECK_URL = "https://gateway.blum.codes/v1/user/me"
+AUTH_URL = "https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP"
 
 def authenticate():
-    response = requests.post(AUTH_URL, json={})
-    if response.status_code == 200:
-        logger.info("Authenticated successfully")
-        return response.json()['token']
-    else:
-        logger.error("Authentication failed")
-        return None
+    # Your authentication logic here
+    logger.info('Authenticated successfully')
 
-def get_user_info(token):
-    headers = {'Authorization': f'Bearer {token}'}
-    response = requests.get(USER_CHECK_URL, headers=headers)
+def get_user_data():
+    response = requests.get(USER_CHECK_URL)
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        username = data['username']
+        balance = data['balance']
+        return username, balance
     else:
-        logger.error("Failed to get user info")
-        return None
+        logger.error('Failed to fetch user data')
+        return None, None
 
-def claim_reward(token):
-    headers = {'Authorization': f'Bearer {token}'}
-    response = requests.post(f"{BASE_URL}/claim", headers=headers)
+def claim_rewards():
+    response = requests.post(f"{BASE_URL}/claim")
     if response.status_code == 200:
-        logger.info("Claim successful")
-        return response.json()
+        logger.info('Claim successful')
+        return True
     else:
-        logger.error("Claim failed")
-        return None
+        logger.error('Claim failed')
+        return False
 
-def start_farming(token):
-    headers = {'Authorization': f'Bearer {token}'}
-    response = requests.post(f"{BASE_URL}/start", headers=headers)
+def start_farming():
+    response = requests.post(f"{BASE_URL}/start")
     if response.status_code == 200:
-        logger.info("Farming started successfully")
-        return response.json()
+        logger.info('Start farming successful')
+        return True
     else:
-        logger.error("Failed to start farming")
-        return None
+        logger.error('Start farming failed')
+        return False
